@@ -26,6 +26,7 @@ class App extends Component {
     console.log(this.state.data);
   };
 
+  //Mendapatkan Data di Local Storage
   getDatabase = () => {
     const getTodo = JSON.parse(localStorage.getItem('todo'));
     if (getTodo != null) {
@@ -36,6 +37,7 @@ class App extends Component {
     }
   };
 
+  //Menambah Data ke Local Storage
   addData = () => {
     const database = this.state.database;
     const data = this.state.data;
@@ -46,6 +48,8 @@ class App extends Component {
       data: ''
     });
   };
+
+  //Menghapus Data
   deleteData = id => {
     const database = this.state.database;
     database.splice(id, 1);
@@ -53,6 +57,7 @@ class App extends Component {
     this.getDatabase();
   };
 
+  //Mendapatkan Data
   getEdit = index => {
     const database = this.state.database;
     const getData = database[index];
@@ -63,6 +68,7 @@ class App extends Component {
     });
   };
 
+  //Mengedit Data
   edit = id => {
     const database = this.state.database;
     const data = this.state.data;
