@@ -1,14 +1,29 @@
 import React, { Component } from 'react';
+import { Button } from 'reactstrap';
+import {
+  Card,
+  CardImg,
+  CardText,
+  CardBody,
+  CardTitle,
+  CardSubtitle
+} from 'reactstrap';
+import './style.css';
 
 class App extends Component {
+  //menampung variabel
   state = {
     database: [],
-    data: ''
+    data: '',
+    tombol: false,
+    id: 0
   };
+
   handleChange = e => {
     this.setState({
       data: e.target.value
     });
+    console.log(this.state.data);
   };
 
   getDatabase = () => {
@@ -38,6 +53,28 @@ class App extends Component {
     this.getDatabase();
   };
 
+  getEdit = index => {
+    const database = this.state.database;
+    const getData = database[index];
+    this.setState({
+      data: getData,
+      tombol: true,
+      id: index
+    });
+  };
+
+  edit = id => {
+    const database = this.state.database;
+    const data = this.state.data;
+    database.splice(id, 1, data);
+    localStorage.setItem('todo', JSON.stringify(database));
+    this.setState({
+      data: '',
+      tombol: false
+    });
+    this.getDatabase();
+  };
+
   componentDidMount() {
     this.getDatabase();
   }
@@ -45,19 +82,43 @@ class App extends Component {
   render() {
     return (
       <div>
-        <input value={this.state.data} onChange={this.handleChange} />
-        <button onClick={() => this.addData()}>Tambah</button>
-        <ul>
-          {this.state.database.map((datum, id) => {
-            return (
-              <div>
-                <li key={id}>{datum}</li>
-                <button onClick={() => this.deleteData(id)}>Hapus</button>
-                <button onClick={() => this.getEdit(id)}>Edit</button>
-              </div>
-            );
-          })}
-        </ul>
+        <Card className="card-style">
+          <input value={this.state.data} onChange={this.handleChange} />
+          {this.state.tombol ? (
+            <div>
+              <Button onClick={() => this.edit(this.state.id)}>Simpan</Button>
+              <Button
+                color="danger"
+                onClick={() =>
+                  this.setState({
+                    tombol: false
+                  })
+                }>
+                Batal
+              </Button>
+            </div>
+          ) : (
+            <Button color="success" onClick={() => this.addData()}>
+              Tambah
+            </Button>
+          )}
+
+          <ul>
+            {this.state.database.map((datum, id) => {
+              return (
+                <div>
+                  <li style={{ color: 'white' }} key={id}>
+                    {datum}
+                  </li>
+                  <Button color="danger" onClick={() => this.deleteData(id)}>
+                    Hapus
+                  </Button>
+                  <Button onClick={() => this.getEdit(id)}>Edit</Button>
+                </div>
+              );
+            })}
+          </ul>
+        </Card>
       </div>
     );
   }
