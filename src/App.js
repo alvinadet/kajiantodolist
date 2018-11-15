@@ -1,14 +1,9 @@
 import React, { Component } from 'react';
-import { Button } from 'reactstrap';
-import {
-  Card,
-  CardImg,
-  CardText,
-  CardBody,
-  CardTitle,
-  CardSubtitle
-} from 'reactstrap';
 import './style.css';
+import './App.css';
+import { connect } from 'react-redux';
+import { addData, deleteData } from './redux/actions/Action';
+//classfull component  > Statefull component
 
 class App extends Component {
   //menampung variabel
@@ -16,14 +11,17 @@ class App extends Component {
     database: [],
     data: '',
     tombol: false,
-    id: 0
+    id: 0,
+    nama: '',
+    isEdit: false,
+    waktu: ''
   };
 
   handleChange = e => {
     this.setState({
-      data: e.target.value
+      [e.target.name]: e.target.value
     });
-    console.log(this.state.data);
+    console.log(this.state);
   };
 
   //Mendapatkan Data di Local Storage
@@ -38,24 +36,24 @@ class App extends Component {
   };
 
   //Menambah Data ke Local Storage
-  addData = () => {
-    const database = this.state.database;
-    const data = this.state.data;
-    database.push(data);
-    localStorage.setItem('todo', JSON.stringify(database));
+  // addData = () => {
+  //   const database = this.state.database;
+  //   const data = this.state.data;
+  //   database.push(data);
+  //   localStorage.setItem('todo', JSON.stringify(database));
 
-    this.setState({
-      data: ''
-    });
-  };
+  //   this.setState({
+  //     nama: ''
+  //   });
+  // };
 
   //Menghapus Data
-  deleteData = id => {
-    const database = this.state.database;
-    database.splice(id, 1);
-    localStorage.setItem('todo', JSON.stringify(database));
-    this.getDatabase();
-  };
+  // deleteData = id => {
+  //   const database = this.state.database;
+  //   database.splice(id, 1);
+  //   localStorage.setItem('todo', JSON.stringify(database));
+  //   this.getDatabase();
+  // };
 
   //Mendapatkan Data
   getEdit = index => {
@@ -81,52 +79,82 @@ class App extends Component {
     this.getDatabase();
   };
 
+  handlePressKey = e => {
+    if (e.key === 'Enter') {
+      localStorage.setItem('nama', this.state.nama);
+      this.setState({
+        isEdit: true
+      });
+    }
+  };
+
   componentDidMount() {
+    let date = new Date();
+    let time = `${date.getHours()}:${date.getMinutes()}`;
     this.getDatabase();
+    this.setState({
+      waktu: time
+    });
+    console.log(this.props.todos);
   }
 
-  render() {
-    return (
-      <div>
-        <Card className="card-style">
-          <input value={this.state.data} onChange={this.handleChange} />
-          {this.state.tombol ? (
-            <div>
-              <Button onClick={() => this.edit(this.state.id)}>Simpan</Button>
-              <Button
-                color="danger"
-                onClick={() =>
-                  this.setState({
-                    tombol: false
-                  })
-                }>
-                Batal
-              </Button>
-            </div>
-          ) : (
-            <Button color="success" onClick={() => this.addData()}>
-              Tambah
-            </Button>
-          )}
+  addHandler = async () => {
+    const data = this.state.nama;
+    this.props.addData(data);
+    console.log(this.props.todos);
+  };
 
-          <ul>
-            {this.state.database.map((datum, id) => {
-              return (
-                <div>
-                  <li style={{ color: 'white' }} key={id}>
-                    {datum}
-                  </li>
-                  <Button color="danger" onClick={() => this.deleteData(id)}>
-                    Hapus
-                  </Button>
-                  <Button onClick={() => this.getEdit(id)}>Edit</Button>
-                </div>
-              );
-            })}
-          </ul>
-        </Card>
+  render() {
+    const todos = this.props.todos;
+    let namaKita = localStorage.getItem('nama');
+    return (
+      <div className="App-header" style={{ textAlign: 'center' }}>
+        <h1>{this.state.waktu}</h1>
+        {this.state.isEdit ? (
+          <div>
+            <h3>Good Afternoon , {namaKita}</h3>
+            <p>What's your focus today?</p>
+            <input
+              type="text"
+              name="nama"
+              value={this.state.nama}
+              onChange={this.handleChange}
+            />
+            <button onClick={() => this.addHandler()}>Tambah</button>
+          </div>
+        ) : (
+          <div>
+            <p>Tell me your name please</p>
+            <input
+              type="text"
+              name="nama"
+              value={this.state.nama}
+              onChange={this.handleChange}
+              onKeyPress={this.handlePressKey}
+            />
+          </div>
+        )}
+
+        {todos.map((datum, key) => {
+          return (
+            <div>
+              <p>{datum}</p>
+              <button onClick={() => this.props.deleteData(key)}>Hapus</button>
+            </div>
+          );
+        })}
       </div>
     );
   }
 }
-export default App;
+
+const mapStateToProps = state => {
+  return {
+    todos: state.todos
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  { addData, deleteData }
+)(App);
