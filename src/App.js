@@ -13,7 +13,7 @@ import './style.css';
 class App extends Component {
   //menampung variabel
   state = {
-    database: [],
+    todos: [],
     data: '',
     tombol: false,
     id: 0
@@ -26,12 +26,16 @@ class App extends Component {
     console.log(this.state.data);
   };
 
+  handleSuccess =()=>{
+    alert("Yeayy, your todo is success added!")
+  }
+
   //Mendapatkan Data di Local Storage
   getDatabase = () => {
     const getTodo = JSON.parse(localStorage.getItem('todo'));
     if (getTodo != null) {
       return this.setState({
-        database: getTodo
+        todos: getTodo
       });
     } else {
     }
@@ -39,7 +43,7 @@ class App extends Component {
 
   //Menambah Data ke Local Storage
   addData = () => {
-    const database = this.state.database;
+    const database = this.state.todos;
     const data = this.state.data;
     database.push(data);
     localStorage.setItem('todo', JSON.stringify(database));
@@ -47,11 +51,12 @@ class App extends Component {
     this.setState({
       data: ''
     });
+    this.handleSuccess()
   };
 
   //Menghapus Data
   deleteData = id => {
-    const database = this.state.database;
+    const database = this.state.todos;
     database.splice(id, 1);
     localStorage.setItem('todo', JSON.stringify(database));
     this.getDatabase();
@@ -59,7 +64,7 @@ class App extends Component {
 
   //Mendapatkan Data
   getEdit = index => {
-    const database = this.state.database;
+    const database = this.state.todos;
     const getData = database[index];
     this.setState({
       data: getData,
@@ -70,7 +75,7 @@ class App extends Component {
 
   //Mengedit Data
   edit = id => {
-    const database = this.state.database;
+    const database = this.state.todos;
     const data = this.state.data;
     database.splice(id, 1, data);
     localStorage.setItem('todo', JSON.stringify(database));
@@ -81,6 +86,8 @@ class App extends Component {
     this.getDatabase();
   };
 
+
+
   componentDidMount() {
     this.getDatabase();
   }
@@ -88,6 +95,7 @@ class App extends Component {
   render() {
     return (
       <div>
+      <h3>Create your day dicipline, add your todo here!</h3>
         <Card className="card-style">
           <input value={this.state.data} onChange={this.handleChange} />
           {this.state.tombol ? (
