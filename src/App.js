@@ -129,4 +129,9 @@ class App extends Component {
     );
   }
 }
+
+const awokkawkowoawowao = () => {
+  return 'awoawkoaooawokaoaokaoaok'
+}
+
 export default App;
